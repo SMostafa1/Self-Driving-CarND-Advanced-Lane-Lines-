@@ -33,7 +33,16 @@ def CalibrateCamera():
             # cv2.waitKey(500)
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
     h, w = img.shape[:2]
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 0, (w, h))
+    #rework:To undistort the image after camera calibration
+    dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+    # f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+    # f.subplots_adjust(hspace=.2, wspace=.05)
+    # ax1.imshow(img)
+    # ax1.set_title('Original Image', fontsize=30)
+    # ax2.imshow(dst)
+    # ax2.set_title('Undistorted Image', fontsize=30)
+    # plt.show()
     # cv2.destroyAllWindows()
     # print(mtx)
     return mtx,dist,newcameramtx
@@ -46,12 +55,12 @@ def Undistortion(img,mtx,dist,newcameramtx):
     undstImg = cv2.undistort(img, mtx, dist, undstImg, newcameramtx)
     # Visualize undistortion
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-    f.subplots_adjust(hspace=.2, wspace=.05)
-    ax1.imshow(img)
-    ax1.set_title('Original Image', fontsize=30)
-    ax2.imshow(undstImg)
-    ax2.set_title('Undistorted Image', fontsize=30)
-    print('...................')
+    # f.subplots_adjust(hspace=.2, wspace=.05)
+    # ax1.imshow(img)
+    # ax1.set_title('Original Image', fontsize=30)
+    # ax2.imshow(undstImg)
+    # ax2.set_title('Undistorted Image', fontsize=30)
+    # print('...................')
     # plt.show()
     return undstImg
 #======================================================================================================================================================#
@@ -189,16 +198,26 @@ def ColorandGradient(img,HLSthreshold=(0,255),threshold=(0,255)):
 #======================================================================================================================================================#
 def corners_unwarp(nx, ny,binaryimg):
     h, w = binaryimg.shape[:2]
-    src = np.float32(
-        [[200, 720],
-         [1100, 720],
-         [595, 450],
-         [685, 450]])
-    dst = np.float32(
-        [[300, 720],
-         [980, 720],
-         [300, 0],
-         [980, 0]])
+    # src = np.float32(
+    #     [[200, 720],
+    #      [1100, 720],
+    #      [595, 450],
+    #      [685, 450]])
+    # dst = np.float32(
+    #     [[300, 720],
+    #      [980, 720],
+    #      [300, 0],
+    #      [980, 0]])
+    #Rework:
+    src = np.float32([[545, 460],
+                      [735, 460],
+                      [1280, 700],
+                      [0, 700]])
+
+    dst = np.float32([[0, 0],
+                      [1280, 0],
+                      [1280, 720],
+                      [0, 720]])
     # src = np.float32([[w // 2 - 76, h * .625], [w // 2 + 76, h * .625], [-100, h], [w + 100, h]])
     # dst = np.float32([[100, 0], [w - 100, 0], [100, h], [w - 100, h]])
     img_size = (binaryimg.shape[1], binaryimg.shape[0])
