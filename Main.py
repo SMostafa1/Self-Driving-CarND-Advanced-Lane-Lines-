@@ -44,7 +44,7 @@ import glob
 #   count += 1
 ###########################################################################################################################################
 mtx,dist,newcameramtx = Utilities.CalibrateCamera()
-
+print(dist)
 def Process (image):
     # img = mpimg.imread(image)
     undistortionImg = Utilities.Undistortion(image, mtx, dist, newcameramtx)
@@ -60,7 +60,16 @@ def Process (image):
                                                                                          right_fit_new, left_lane_inds,
                                                                                          right_lane_inds)
     #################################################Draw lane##########################################################
-    results = Utilities.draw_lane(image, binary_warped, left_fitx, right_fitx, m_inv, ploty)
+    results = Utilities.draw_lane(undistortionImg, binary_warped, left_fitx, right_fitx, m_inv, ploty)
+    curv_rad = (left_curverad+right_curverad)/2
+
+    text = 'Curve radius: ' + '{:04.2f}'.format(curv_rad) + 'm'
+    font = cv2.FONT_HERSHEY_DUPLEX
+    results = cv2.putText(results, text, (40,70), font, 1.5, (200,255,155), 2, cv2.LINE_AA)
+    abs_center_dist = abs(center_dist)
+    text = 'Offset:'+'{:04.3f}'.format(abs_center_dist) + 'm '
+    results=cv2.putText(results, text, (40, 120), font, 1.5, (200, 255, 155), 2, cv2.LINE_AA)
+
     return results
 
 #################Detect lane in video##################################
