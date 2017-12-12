@@ -20,11 +20,12 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./report/Cam_Calib.png "Undistorted"
-[image2]: ./report/Figure_1.png "Road Transformed"
+[image2]: ./report/Figure_distort.png "Road Transformed"
 [image3]: ./report/Figure_1-1.png "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
 [image6]: ./report/Figure_1-2.png "Output"
+[image7]:./report/calib_undistortion.png
 [video1]: ./output_video/output_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -51,11 +52,13 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 Then, I refine the camera matrix based on a free scaling parameter using cv2.getOptimalNewCameraMatrix().
 ![alt text][image1]
 
+![alt text][image7]
 ### Pipeline (single images)
 
 #### 1. Provide an example of a distortion-corrected image.
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+I used `Undistortion()` which call `cv2.undistort()`
 ![alt text][image2]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
