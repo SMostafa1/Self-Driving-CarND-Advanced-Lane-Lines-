@@ -165,34 +165,64 @@ def Undistortion(img,mtx,dist,newcameramtx):
 
 #======================================================================================================================================================#
 def ColorandGradient(img,HLSthreshold=(0,255),threshold=(0,255)):
-    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
-    l_channel = hls[:, :, 1]
-    s_channel = hls[:, :, 2]
-    # Sobel x
-    sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0)  # Take the derivative in x
-    abs_sobelx = np.absolute(sobelx)  # Absolute x derivative to accentuate lines away from horizontal
-    scaled_sobel = np.uint8(255 * abs_sobelx / np.max(abs_sobelx))
+    ###############################################commmented due to rework############################################
+    # hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+    # l_channel = hls[:, :, 1]
+    # s_channel = hls[:, :, 2]
+    # # Sobel x
+    # sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0)  # Take the derivative in x
+    # abs_sobelx = np.absolute(sobelx)  # Absolute x derivative to accentuate lines away from horizontal
+    # scaled_sobel = np.uint8(255 * abs_sobelx / np.max(abs_sobelx))
+    #
+    # sx_thresh = (20, 100)
+    # s_thresh = (90, 255)
+    # # Threshold x gradient
+    # sxbinary = np.zeros_like(scaled_sobel)
+    # sxbinary[(scaled_sobel >= sx_thresh[0]) & (scaled_sobel <= sx_thresh[1])] = 1
+    #
+    # # Threshold color channel
+    # s_binary = np.zeros_like(s_channel)
+    # s_binary[(s_channel >= s_thresh[0]) & (s_channel <= s_thresh[1])] = 1
+    # # Stack each channel
+    # # Note color_binary[:, :, 0] is all 0s, effectively an all black image. It might
+    # # be beneficial to replace this channel with something else.
+    #
+    # color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary)) * 255
+    #
+    # # Combine the two binary thresholds
+    # color_binary = np.zeros_like(sxbinary)
+    # color_binary[(s_binary == 1) | (sxbinary == 1)] = 1
+    ###############################################commmented due to rework############################################
+    ########################Rework#################
+    s_channel = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)[:, :, 2]
 
-    sx_thresh = (20, 100)
-    s_thresh = (90, 255)
-    # Threshold x gradient
-    sxbinary = np.zeros_like(scaled_sobel)
-    sxbinary[(scaled_sobel >= sx_thresh[0]) & (scaled_sobel <= sx_thresh[1])] = 1
+    l_channel = cv2.cvtColor(img, cv2.COLOR_RGB2LUV)[:, :, 0]
+
+    b_channel = cv2.cvtColor(img, cv2.COLOR_RGB2Lab)[:, :, 2]
 
     # Threshold color channel
+    s_thresh_min = 180
+    s_thresh_max = 255
     s_binary = np.zeros_like(s_channel)
-    s_binary[(s_channel >= s_thresh[0]) & (s_channel <= s_thresh[1])] = 1
-    # Stack each channel
-    # Note color_binary[:, :, 0] is all 0s, effectively an all black image. It might
-    # be beneficial to replace this channel with something else.
+    s_binary[(s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)] = 1
 
-    color_binary = np.dstack((np.zeros_like(sxbinary), sxbinary, s_binary)) * 255
+    b_thresh_min = 155
+    b_thresh_max = 200
+    b_binary = np.zeros_like(b_channel)
+    b_binary[(b_channel >= b_thresh_min) & (b_channel <= b_thresh_max)] = 1
 
-    # Combine the two binary thresholds
-    color_binary = np.zeros_like(sxbinary)
-    color_binary[(s_binary == 1) | (sxbinary == 1)] = 1
+    l_thresh_min = 225
+    l_thresh_max = 255
+    l_binary = np.zeros_like(l_channel)
+    l_binary[(l_channel >= l_thresh_min) & (l_channel <= l_thresh_max)] = 1
 
-    return color_binary
+    # color_binary = np.dstack((u_binary, s_binary, l_binary))
+
+    combined_binary = np.zeros_like(s_binary)
+    combined_binary[(l_binary == 1) | (b_binary == 1)] = 1
+
+    ##############################################
+    return combined_binary
 #======================================================================================================================================================#
 
 #======================================================================================================================================================#
